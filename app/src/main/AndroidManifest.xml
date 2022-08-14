@@ -3,6 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.minitiktok.android">
 
+    <queries>
+        <!--允许查询抖音和抖音极速版的软件包信息-->
+        <package android:name="com.ss.android.ugc.aweme" />
+        <package android:name="com.ss.android.ugc.aweme.lite" />
+    </queries>
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -14,7 +22,7 @@
         android:theme="@style/Theme.MiniTiktok"
         tools:targetApi="31">
         <activity
-            android:name=".MainActivity"
+            android:name=".TikTokApplication"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,3 +33,18 @@
     </application>
 
 </manifest>
+
+<!--
+{
+	"data": {
+		"access_token": "clt.495b20a1379445594df9697abeb65e8aWPWwgQncZcneCrOIxcbEz9FTi8GF",
+		"captcha": "",
+		"desc_url": "",
+		"description": "",
+		"error_code": 0,
+		"expires_in": 7200,
+		"log_id": "2022081420313001021217007604D37C95"
+	},
+	"message": "success"
+}
+-->
