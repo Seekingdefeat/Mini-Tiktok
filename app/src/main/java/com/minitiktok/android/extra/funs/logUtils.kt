@@ -1,4 +1,4 @@
-package com.minitiktok.android.extra
+package com.minitiktok.android.extra.funs
 
 import android.util.Log
 

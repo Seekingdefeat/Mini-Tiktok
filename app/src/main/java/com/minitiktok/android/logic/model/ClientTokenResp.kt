@@ -30,3 +30,6 @@ data class ClientToken(
 
 fun ClientTokenRespData.toEntity(clientKey: String) =
     ClientToken(access_token, description, expires_in, clientKey, System.currentTimeMillis())
+
+fun ClientToken.isExpire() =
+    System.currentTimeMillis().div(1000).minus(this.create_time!!.div(1000)) > this.expires_in!!

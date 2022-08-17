@@ -9,7 +9,7 @@ import retrofit2.http.Query
 
 interface AccessTokenService {
     //Content-Type: application/x-www-form-urlencoded
-    @POST("oauth/access_token?grant_type=authorization_code")
+    @POST("oauth/access_token/?grant_type=authorization_code")
     @Headers("Content-Type:application/x-www-form-urlencoded")
     fun getAccessToken(
         @Query("client_secret") clientSecret: String,

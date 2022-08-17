@@ -1,8 +1,8 @@
 package com.minitiktok.android
 
+import com.minitiktok.android.extra.funs.movieDecode
+import com.minitiktok.android.extra.funs.movieFormat
 import org.junit.Test
-
-import org.junit.Assert.*
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -11,7 +11,11 @@ import org.junit.Assert.*
  */
 class ExampleUnitTest {
     @Test
-    fun addition_isCorrect() {
-        assertEquals(4, 2 + 2)
+    fun testMovieFormat() {
+        //assertEquals(4, 2 + 2)
+        val list = listOf("波多野结衣", "苍井空", "葵司")
+        val movieFormat = list.movieFormat(" ")
+        println(movieFormat);
+        println(movieFormat.movieDecode(" ")[1])
     }
 }

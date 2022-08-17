@@ -1,62 +1,44 @@
 package com.minitiktok.android.logic.network
 
-import androidx.lifecycle.liveData
 import com.minitiktok.android.TikTokApplication
-import com.minitiktok.android.extra.logUtils
-import com.minitiktok.android.extra.throwRunEx
+import com.minitiktok.android.extra.interfaces.ClientTokenRepository
 import com.minitiktok.android.logic.dao.CTDatabase
-import com.minitiktok.android.logic.model.toEntity
-import kotlinx.coroutines.Dispatchers
+import com.minitiktok.android.logic.dao.MovieDatabase
+import com.minitiktok.android.logic.dao.VersionDatabase
+import com.minitiktok.android.logic.model.ClientToken
+import com.minitiktok.android.logic.model.ClientTokenResp
+import com.minitiktok.android.logic.model.MovieEntity
+import com.minitiktok.android.logic.model.Version
 
 
-object Repository {
+object Repository : ClientTokenRepository {
     private val clientTokenDao = CTDatabase.getInstance(TikTokApplication.context).ClientTokenDao()
 
-    fun refreshAccessToken(clientSecret: String, code: String, clientKey: String) =
-        liveData(Dispatchers.IO) {
-            logUtils.d("授权登录", "测试")
-            val result = try {
-                val accessTokenResp =
-                    AccessTokenNetwork.getAccessToken(clientSecret, code, clientKey)
-                if (accessTokenResp.respData.errorCode == 0) {
-                    Result.success(accessTokenResp.respData)
-                } else {
-                    Result.failure("响应码错误：${accessTokenResp.respData.errorCode}".throwRunEx())
-                }
-            } catch (e: Exception) {
-                Result.failure(e)
-            }
-            emit(result)
-        }
+    private val versionDao = VersionDatabase.getInstance(TikTokApplication.context).VersionDao()
 
-    private fun refreshClientToken(clientKey: String, clientSecret: String) =
-        liveData(Dispatchers.IO) {
-            val result = try {
-                val resp = clientTokenDao.getTokenByKey(clientKey)
-                if (resp.isNotEmpty()) {
-                    //超时(时限2个小时)需要重新获取，暂时默认不会超时
-                    Result.success(resp[0])
-                } else {
-                    //重新申请token
-                    val networkResp = AccessTokenNetwork.getClientToken(clientKey, clientSecret)
-                    if (networkResp.respData.error_code == 0) {
-                        //封装为一个ClientToken
-                        val token = networkResp.respData.toEntity(TikTokApplication.CLIENT_KEY)
-                        //插入数据库
-                        clientTokenDao.insertToken(token)
-                        Result.success(token)
-                    } else {
+    private val movieDao = MovieDatabase.getInstance(TikTokApplication.context).MovieDao()
 
-                        Result.failure("响应码错误：${networkResp.respData.error_code}".throwRunEx())
-                    }
-                }
-            } catch (e: Exception) {
-                Result.failure(e)
-            }
-            emit(result)
-        }
 
-    fun getClientToken(clientKey: String, clientSecret: String) =
-        refreshClientToken(clientKey, clientSecret)
+    fun insertMovies(movies: List<MovieEntity>) = movieDao.insertMovies(movies)
+
+    fun getAllMovies(): List<MovieEntity> = movieDao.getAllMovies()
+
+    fun getAllVersions(): List<Version> = versionDao.getAllVersions()
+
+    fun insertVersions(versions: List<Version>, now: Long, count: Long, cursor: Long) =
+        versionDao.insertVersions(versions, now, count, cursor)
+
+    override fun insertClientToken(token: ClientToken): Long = clientTokenDao.insertToken(token)
+
+    override fun getClientTokenByKey(clientKey: String): List<ClientToken> =
+        clientTokenDao.getTokenByKey(clientKey)
+
+    override fun clearTokens() = clientTokenDao.clearTokens()
+
+    override suspend fun getClientTokenByNet(
+        clientKey: String,
+        clientSecret: String
+    ): ClientTokenResp =
+        AccessTokenNetwork.getClientToken(clientKey, clientSecret)
 
 }
